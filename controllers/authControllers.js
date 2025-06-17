@@ -161,7 +161,7 @@ const update = async (req, res)=>{
     if(existingUser.avatar) await cloudinary.uploader.destroy(existingUser.avatar.split('/').pop().split('.')[0]);
     
     // Upload Avatar
-    const result = await cloudinary.uploader.upload(req.file.path)
+    const result = await cloudinary.uploader.upload(req.file.path, { folder: "Avatar"})
     existingUser.avatar = result.url;
     fs.unlinkSync(req.file.path)
   }
