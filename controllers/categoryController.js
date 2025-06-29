@@ -4,9 +4,12 @@ const fs = require('fs');
 const createCategory = async (req, res)=>{
     const {name} = req.body;
 
-    if(!name) return res.status(400).send({error: "Category name is required!"});
-    if(!req?.file?.path) return res.status(400).send({error: "Category image is required!"});
+    if(!name) return res.status(400).send({message: "Category name is required!"});
+    if(!req?.file?.path) return res.status(400).send({message: "Category image is required!"});
 
+    const existingCategory = await categorySchema.findOne({ name: { $regex: `${name}`, $options: 'i' } })
+
+    if(existingCategory) return res.status(400).send({message: "Category is already exist"});   
       
     // Upload Category Image
     const result = await cloudinary.uploader.upload(req.file.path, { folder: "categories"})
@@ -19,8 +22,7 @@ const createCategory = async (req, res)=>{
     })
 
     category.save()
-
-    res.status(201).send({success: "Category created", category});
+    res.status(201).send({message: "Category created", category});
 }
 
 const getCategories = async (req, res)=>{
