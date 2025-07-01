@@ -9,7 +9,7 @@ const productSchema = new Schema(
     },
     description: {
       type: String,
-      // required: true
+      required: true
     },
     price: {
       type: Number,
@@ -17,11 +17,11 @@ const productSchema = new Schema(
     },
     stock: {
       type: Number,
-      // required: true
+      required: true
     },
     mainImg: {
       type: String,
-      // required: true
+      required: true
     },
     images: [
       {
@@ -29,9 +29,9 @@ const productSchema = new Schema(
       },
     ],
     category: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Category",
-      // required: true
+      required: true
     },
     status: {
       type: String,
@@ -43,16 +43,15 @@ const productSchema = new Schema(
         name: {
           type: String,
           enum: ["color", "size"],
+          lowercase: true,
         },
         options: [
           {
             colorname: {
               type: String,
-              required: true,
             },
             size: {
               type: String,
-              required: true,
             },
             additionalPrice: {
               type: Number,
