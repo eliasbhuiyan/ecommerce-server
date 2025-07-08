@@ -6,7 +6,10 @@ const {
 const upload = require("../../helpers/multer");
 const RoleCheck = require("../../middleware/roleMiddleware");
 const authMiddleware = require("../../middleware/authMiddleware");
-const { createProduct } = require("../../controllers/productController");
+const {
+  createProduct,
+  updateProduct,
+} = require("../../controllers/productController");
 const router = express.Router();
 
 router.post(
@@ -25,5 +28,13 @@ router.post(
     { name: "images", maxCount: 8 },
   ]),
   createProduct
+);
+router.post(
+  "/update/:slug",
+  upload.fields([
+    { name: "mainImg", maxCount: 1 },
+    { name: "images", maxCount: 8 },
+  ]),
+  updateProduct
 );
 module.exports = router;
