@@ -9,6 +9,7 @@ const authMiddleware = require("../../middleware/authMiddleware");
 const {
   createProduct,
   updateProduct,
+  getAllProducts,
 } = require("../../controllers/productController");
 const router = express.Router();
 
@@ -37,4 +38,5 @@ router.post(
   ]),
   updateProduct
 );
+router.get("/productlist", getAllProducts);
 module.exports = router;
