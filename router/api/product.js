@@ -10,6 +10,7 @@ const {
   createProduct,
   updateProduct,
   getAllProducts,
+  deleteProduct,
 } = require("../../controllers/productController");
 const router = express.Router();
 
@@ -38,5 +39,13 @@ router.post(
   ]),
   updateProduct
 );
+// product/productlist?page=1&limit=10&search=premium&status=pending&category=mens
 router.get("/productlist", getAllProducts);
+
+router.delete(
+  "/deleteproduct/:productID",
+  authMiddleware,
+  RoleCheck(["admin"]),
+  deleteProduct
+);
 module.exports = router;

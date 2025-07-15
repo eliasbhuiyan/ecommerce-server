@@ -3,6 +3,7 @@ const cloudinary = require("../helpers/cloudinary");
 const fs = require("fs");
 const generateSlug = require("../helpers/slugGerarator");
 const SearchRegx = require("../helpers/SearchRegx");
+const categorySchema = require("../models/categorySchema");
 const createProduct = async (req, res) => {
   const { title, description, price, stock, category, varients } = req.body;
 
@@ -98,7 +99,8 @@ const createProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const { title, description, price, stock, category, varients } = req.body;
+  const { title, description, price, stock, category, varients, status } =
+    req.body;
   const { slug } = req.params;
 
   try {
@@ -114,6 +116,14 @@ const updateProduct = async (req, res) => {
     if (stock) existingProduct.stock = stock;
     if (category) existingProduct.category = category;
     if (varients && varients.length > 0) existingProduct.varients = varients;
+    if (
+      status &&
+      ["active", "pending", "reject"].includes(status.toLowerCase())
+    ) {
+      if (req.user.role === "admin") {
+        existingProduct.status = status;
+      }
+    }
     if (req?.files?.mainImg?.length > 0) {
       let mainImg;
       for (item of req.files.mainImg) {
@@ -139,32 +149,37 @@ const updateProduct = async (req, res) => {
     res.status(500).send({ error: "Server error!" });
   }
 };
-function escapeRegex(text) {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-}
 
-function buildSearchQuery(search) {
-  if (!search || !search.trim()) return {};
-
-  const words = search.trim().split(/\s+/);
-  const regexConditions = words.map((word) => ({
-    title: { $regex: new RegExp(escapeRegex(word), "i") },
-  }));
-
-  return { $and: regexConditions };
-}
 const getAllProducts = async (req, res) => {
   try {
     const search = req.query.search || "";
+    const status = req.query.status || "";
+    const categoryName = req.query.category || "";
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
     const totalProducts = await productSchema.countDocuments();
     const totalPages = Math.ceil(totalProducts / limit);
     const skip = (page - 1) * limit;
+    const query = {};
+    if (search) {
+      query.title = { $regex: SearchRegx(search), $options: "i" };
+    }
+    if (status) {
+      query.status = status;
+    }
+    if (categoryName) {
+      const categoryData = await categorySchema.findOne({
+        name: { $regex: SearchRegx(categoryName), $options: "i" },
+      });
+      if (categoryData) query.category = categoryData._id;
+    }
 
-    const query = buildSearchQuery(search);
-    const products = await productSchema.find(query).skip(skip).limit(limit);
+    const products = await productSchema
+      .find(query)
+      .skip(skip)
+      .limit(limit)
+      .populate("category");
 
     const hasPrevPage = page > 1;
     const hasNextPage = page < totalPages;
@@ -185,4 +200,22 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-module.exports = { createProduct, updateProduct, getAllProducts };
+const deleteProduct = async (req, res) => {
+  const { productID } = req.params;
+
+  try {
+    const product = await productSchema.findByIdAndDelete(productID);
+    if (!product)
+      return res.status(400).send({ message: "No produuct found." });
+    res.status(201).send({ message: "Product deleted." });
+  } catch (error) {
+    res.status(500).send({ error: "Server error!" });
+  }
+};
+
+module.exports = {
+  createProduct,
+  updateProduct,
+  getAllProducts,
+  deleteProduct,
+};
