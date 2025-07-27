@@ -62,4 +62,5 @@ router.put("/updatecart", authMiddleware, updateCartItem);
 router.delete("/deletecartitem/:productId", authMiddleware, deleteCartItem);
 router.get("/getcart", authMiddleware, getCart);
 
+
 module.exports = router;
