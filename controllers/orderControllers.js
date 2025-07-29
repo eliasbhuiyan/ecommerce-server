@@ -1,5 +1,8 @@
 const orderSchema = require("../models/orderSchema");
 const productSchema = require("../models/productSchema");
+const stripe = require("stripe")(
+  sk_test_51RqB8tAbIRDvcZEU89TIIldz0vSQiZuJew8mksqMFFctdu4awTqeUd2EZIPADVBLMNVBaIXj8wIk4Ch7V4dKSKnL00adehkYdn
+);
 
 const addNewOrder = async (req, res) => {
   const { items, shippingAddress, phone } = req.body;
@@ -10,7 +13,7 @@ const addNewOrder = async (req, res) => {
   if (!phone) return res.status(400).send("Phone number is required");
 
   let totalAmount = 0;
-  const populatedItems = [];
+  // const populatedItems = [];
 
   for (const item of items) {
     const product = await productSchema.findById(item.productId);
@@ -50,7 +53,59 @@ const addNewOrder = async (req, res) => {
   });
 
   const createdOrder = await order.save();
+
   res.status(201).json(createdOrder);
 };
+const paymentIntent = async (req, res) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: req.body.amount,
+      currency: "usd",
+    });
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-module.exports = { addNewOrder };
+// Update order by ID
+const updateOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    let updateFields = {};
+
+    // Validate status if present
+    const allowedStatuses = [
+      "pending",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled",
+    ];
+
+    if (status && !allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+    updateFields.status = status;
+
+    if (status === "delivered") {
+      updateFields.isDelivered = true;
+      updateFields.deliveredAt = new Date.now();
+    }
+    updateFields.updatedBy = req.user.id;
+
+    // Fetch order
+    const order = await orderSchema.findByIdAndUpdate(orderId, updateFields);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res.status(200).json(order);
+  } catch (error) {
+    console.error("Error updating order:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { addNewOrder, updateOrder, paymentIntent };
