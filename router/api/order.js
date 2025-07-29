@@ -9,7 +9,7 @@ const RoleCheck = require("../../middleware/roleMiddleware");
 const router = express.Router();
 
 router.post("/create", authMiddleware, addNewOrder);
-router.post("/payment-intent", paymentIntent);
+// router.post("/payment-intent", paymentIntent);
 router.post(
   "/updatestatus/:orderId",
   authMiddleware,

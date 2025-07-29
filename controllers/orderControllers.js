@@ -1,8 +1,8 @@
 const orderSchema = require("../models/orderSchema");
 const productSchema = require("../models/productSchema");
-const stripe = require("stripe")(
-  sk_test_51RqB8tAbIRDvcZEU89TIIldz0vSQiZuJew8mksqMFFctdu4awTqeUd2EZIPADVBLMNVBaIXj8wIk4Ch7V4dKSKnL00adehkYdn
-);
+// const stripe = require("stripe")(
+//   sk_test_51RqB8tAbIRDvcZEU89TIIldz0vSQiZuJew8mksqMFFctdu4awTqeUd2EZIPADVBLMNVBaIXj8wIk4Ch7V4dKSKnL00adehkYdn
+// );
 
 const addNewOrder = async (req, res) => {
   const { items, shippingAddress, phone } = req.body;
@@ -56,19 +56,20 @@ const addNewOrder = async (req, res) => {
 
   res.status(201).json(createdOrder);
 };
-const paymentIntent = async (req, res) => {
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: req.body.amount,
-      currency: "usd",
-    });
-    res.json({ clientSecret: paymentIntent.client_secret });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+// const paymentIntent = async (req, res) => {
+//   try {
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount: req.body.amount,
+//       currency: "usd",
+//     });
+//     res.json({ clientSecret: paymentIntent.client_secret });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 // Update order by ID
+
 const updateOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -108,4 +109,4 @@ const updateOrder = async (req, res) => {
   }
 };
 
-module.exports = { addNewOrder, updateOrder, paymentIntent };
+module.exports = { addNewOrder, updateOrder };
