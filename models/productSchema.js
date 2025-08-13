@@ -9,7 +9,12 @@ const productSchema = new Schema(
     },
     description: {
       type: String,
-      required: true
+      required: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
     },
     price: {
       type: Number,
@@ -17,11 +22,11 @@ const productSchema = new Schema(
     },
     stock: {
       type: Number,
-      required: true
+      required: true,
     },
     mainImg: {
       type: String,
-      required: true
+      required: true,
     },
     images: [
       {
@@ -31,7 +36,7 @@ const productSchema = new Schema(
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
-      required: true
+      required: true,
     },
     status: {
       type: String,
