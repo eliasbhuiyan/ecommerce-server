@@ -7,33 +7,27 @@ const categorySchema = require("../models/categorySchema");
 const createProduct = async (req, res) => {
   const { title, description, price, stock, category, varients } = req.body;
 
-  // Upload Main  Image
-  let mainImg;
-  req.files.mainImg.forEach(async (item) => {
-    console.log(item);
+  try {
+    if (!title)
+      return res.status(400).send({ message: "product name is required!" });
 
-    // mainImg = await cloudinary.uploader.upload(item.path, {
-    //   folder: "products",
-    // });
-    fs.unlinkSync(item.path);
-  });
+    if (!description)
+      return res
+        .status(400)
+        .send({ message: "Product description is required!" });
+    if (!price) return res.status(400).send({ message: "Price is required!" });
+    if (!stock) return res.status(400).send({ message: "Stock is required!" });
+    if (!category)
+      return res.status(400).send({ message: "Category is required!" });
+    if (varients.length < 1)
+      return res.status(400).send({ message: "Add minimum one varient." });
+    if (!req.files.mainImg)
+      return res.status(400).send({ message: "Main image is required!" });
+    const slug = generateSlug(title);
 
-  console.log(mainImg);
-  return;
-  if (!title)
-    return res.status(400).send({ message: "product name is required!" });
-  if (!description)
-    return res
-      .status(400)
-      .send({ message: "Product description is required!" });
-  if (!price) return res.status(400).send({ message: "Price is required!" });
-  if (!stock) return res.status(400).send({ message: "Stock is required!" });
-  if (!category)
-    return res.status(400).send({ message: "Category is required!" });
-  if (varients.length < 1)
-    return res.status(400).send({ message: "Add minimum one varient." });
-  if (!req.files.mainImg)
-    return res.status(400).send({ message: "Main image is required!" });
+    const existingProduct = await productSchema.findOne({ slug: slug });
+    if (existingProduct)
+      return res.status(400).send({ message: "Product title already used." });
 
     varients.map((items) => {
       // Varients enum validation
