@@ -213,9 +213,24 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const productDetails = async (req, res) => {
+  const { slug } = req.params;
+  try {
+    const product = await productSchema
+      .findOne({ slug: slug })
+      .populate("category");
+
+    if (!product) return res.status(400).send({ error: "Product not found!" });
+    res.status(200).send(product);
+  } catch (error) {
+    res.status(500).send({ error: "Server error!" });
+  }
+};
+
 module.exports = {
   createProduct,
   updateProduct,
   getAllProducts,
   deleteProduct,
+  productDetails,
 };

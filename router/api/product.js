@@ -11,6 +11,7 @@ const {
   updateProduct,
   getAllProducts,
   deleteProduct,
+  productDetails,
 } = require("../../controllers/productController");
 const {
   addtocart,
@@ -54,7 +55,7 @@ router.delete(
   RoleCheck(["admin"]),
   deleteProduct
 );
-
+router.get("/details/:slug", productDetails);
 // Cart routes
 
 router.post("/addtocart", authMiddleware, addtocart);
