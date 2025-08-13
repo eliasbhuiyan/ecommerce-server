@@ -11,8 +11,8 @@ const router = express.Router();
 
 router.post(
   "/createcategory",
-  // authMiddleware,
-  // RoleCheck(["admin"]),
+  authMiddleware,
+  RoleCheck(["admin"]),
   upload.single("category"),
   createCategory
 );

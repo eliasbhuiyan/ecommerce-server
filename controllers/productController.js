@@ -5,17 +5,27 @@ const createProduct = async (req, res) => {
   const { title, description, price, stock, category, varients } = req.body;
 
   // Upload Main  Image
-  let mainImg;
-  req.files.mainImg.forEach(async (item) => {
-    console.log(item);
 
-    // mainImg = await cloudinary.uploader.upload(item.path, {
-    //   folder: "products",
-    // });
-    fs.unlinkSync(item.path);
-  });
+  // let mainImg;
+  // for (const item of req.files.mainImg) {
+  //   const result = await cloudinary.uploader.upload(item.path, {
+  //     folder: "products",
+  //   });
+  //   fs.unlinkSync(item.path);
+  //   mainImg = result.url;
+  // }
+  // console.log(mainImg);
 
-  console.log(mainImg);
+  // let productImages = [];
+  // for (const item of req.files.images) {
+  //   const result = await cloudinary.uploader.upload(item.path, {
+  //     folder: "products",
+  //   });
+  //   fs.unlinkSync(item.path);
+  //   productImages.push(result.url);
+  // }
+  // console.log(productImages);
+
   return;
   if (!title)
     return res.status(400).send({ message: "product name is required!" });
