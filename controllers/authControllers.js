@@ -14,7 +14,8 @@ const registration = async (req, res) => {
   const { fullName, email, password, avatar, address, phone, role } = req.body;
 
   try {
-    if (!fullName) return res.status(400).send({ error: "Name is required!" });
+    if (!fullName)
+      return res.status(400).send({ error: "FullName is required!" });
     if (!email) return res.status(400).send({ error: "Email is required!" });
     if (!phone) return res.status(400).send({ error: "Phone is required!" });
     if (!password)
@@ -130,7 +131,19 @@ const profile = async (req, res) => {
   try {
     const user = await userSchema.findById(req.user.id);
     if (!user) return res.status(400).send({ error: "User not found!" });
-    res.status(200).send(user);
+    const loggedUser = {
+      email: user.email,
+      _id: user._id,
+      fullName: user.fullName,
+      avatar: user.avatar,
+      isVarified: user.isVarified,
+      phone: user.phone,
+      address: user.address,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+    res.status(200).send({ profile: loggedUser });
   } catch (error) {
     res.status(500).send({ error: "Server error!" });
   }
