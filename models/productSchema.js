@@ -52,7 +52,7 @@ const productSchema = new Schema(
         },
         options: [
           {
-            colorname: {
+            color: {
               type: String,
             },
             size: {
